@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PromptCoroner - Login</title>
+<!-- FontAwesome for icons -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Three.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+  // Setup 3D Background Particle Field
+  const bgInit = () => {
+    const container = document.getElementById('bg-canvas');
+    const scene = new THREE.Scene();
+    
+    // Add subtle ambient fog matching background
+    scene.fog = new THREE.FogExp2(0x0B0D13, 0.001);
+
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+    camera.position.z = 1000;
+
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+
+    // Create particles
+    const geometry = new THREE.BufferGeometry();
+    const particlesCount = 1500;
+    const posArray = new Float32Array(particlesCount * 3);
+    const colorArray = new Float32Array(particlesCount * 3);
+
+    const color1 = new THREE.Color('#7F75F8');
+    const color2 = new THREE.Color('#5587F7');
+
+    for(let i = 0; i < particlesCount * 3; i+=3) {
+      // Spread particles widely
+      posArray[i] = (Math.random() - 0.5) * 3000;
+      posArray[i+1] = (Math.random() - 0.5) * 3000;
+      posArray[i+2] = (Math.random() - 0.5) * 2000;
+
+      // Mix colors
+      const mixedColor = color1.clone().lerp(color2, Math.random());
+      colorArray[i] = mixedColor.r;
+      colorArray[i+1] = mixedColor.g;
+      colorArray[i+2] = mixedColor.b;
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
+
+    const material = new THREE.PointsMaterial({
+      size: 4,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.6,
+      blending: THREE.AdditiveBlending
+    });
+
+    const particlesMesh = new THREE.Points(geometry, material);
+    scene.add(particlesMesh);
+
+    // Mouse Interaction
+    let mouseX = 0;
+    let mouseY = 0;
+    let targetX = 0;
+    let targetY = 0;
+
+    const windowHalfX = window.innerWidth / 2;
+    const windowHalfY = window.innerHeight / 2;
+
+    document.addEventListener('mousemove', (event) => {
+      mouseX = (event.clientX - windowHalfX);
+      mouseY = (event.clientY - windowHalfY);
+    });
+
+    // Handle Resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    const animate = () => {
+      requestAnimationFrame(animate);
+
+      targetX = mouseX * 0.1;
+      targetY = mouseY * 0.1;
+
+      particlesMesh.rotation.y += 0.001;
+      particlesMesh.rotation.x += 0.0005;
+
+      // Smooth camera movement
+      camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.02;
+      camera.position.y += (-mouseY * 0.5 - camera.position.y) * 0.02;
+      camera.lookAt(scene.position);
+
+      renderer.render(scene, camera);
+    };
+
+    animate();
+  };
+
+  // Setup 3D Centerpiece
+  const centerpieceInit = () => {
+    const container = document.getElementById('centerpiece-canvas');
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
+    camera.position.z = 5;
+
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+
+    // Create a faceted diamond / octahedron shape
+    const geometry = new THREE.OctahedronGeometry(1.5, 0);
+    
+    // Tech-noir wireframe + solid material setup
+    const material = new THREE.MeshStandardMaterial({
+      color: 0x5587F7,
+      emissive: 0x2A1B6A,
+      emissiveIntensity: 0.5,
+      roughness: 0.2,
+      metalness: 0.8,
+      flatShading: true,
+      transparent: true,
+      opacity: 0.9
+    });
+
+    const mesh = new THREE.Mesh(geometry, material);
+    
+    // Add wireframe overlay for investigative tech look
+    const wireframeMaterial = new THREE.MeshBasicMaterial({
+      color: 0x7F75F8,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.4
+    });
+    const wireframe = new THREE.Mesh(geometry, wireframeMaterial);
+    mesh.add(wireframe);
+
+    // --- Scanning Light Beam Effect ---
+    const beamGeometry = new THREE.CylinderGeometry(1.6, 1.6, 0.05, 32);
+    const beamMaterial = new THREE.MeshBasicMaterial({
+      color: 0x8774f9,
+      transparent: true,
+      opacity: 0.8,
+      blending: THREE.AdditiveBlending,
+      side: THREE.DoubleSide
+    });
+    const scanBeam = new THREE.Mesh(beamGeometry, beamMaterial);
+    scanBeam.rotation.x = Math.PI / 2;
+    mesh.add(scanBeam);
+
+    scene.add(mesh);
+
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+
+    const pointLight = new THREE.PointLight(0x7F75F8, 2);
+    pointLight.position.set(2, 3, 4);
+    scene.add(pointLight);
+
+    const pointLight2 = new THREE.PointLight(0x5587F7, 2);
+    pointLight2.position.set(-2, -3, 2);
+    scene.add(pointLight2);
+
+    const animate = () => {
+      requestAnimationFrame(animate);
+      
+      const time = Date.now() * 0.001;
+
+      // Smooth rotation
+      mesh.rotation.y += 0.01;
+      mesh.rotation.x += 0.005;
+      
+      // Gentle floating
+      mesh.position.y = Math.sin(time * 2) * 0.15;
+
+      // Scan beam movement
+      // Cycle between -1.5 and 1.5 height
+      scanBeam.position.y = Math.sin(time * 1.5) * 1.6;
+      // Pulse opacity
+      scanBeam.material.opacity = 0.4 + Math.sin(time * 3) * 0.4;
+
+      renderer.render(scene, camera);
+    };
+
+    animate();
+  };
+
+  // Initialize both
+  window.addEventListener('load', () => {
+    bgInit();
+    centerpieceInit();
+  });
+</script>
+<style data-purpose="custom-styles">
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+    
+    body {
+      background-color: #0B0D13;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', sans-serif;
+      margin: 0;
+      color: #fff;
+      overflow: hidden;
+    }
+
+    #bg-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+    }
+
+    /* Custom input focus styles */
+    input:focus {
+      outline: none;
+      border-color: #5587F7 !important;
+      box-shadow: 0 0 0 1px #5587F7 !important;
+    }
+
+    /* Brand text gradient */
+    .text-brand-gradient {
+      background: linear-gradient(to right, #8774f9, #4f8bf6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  </style>
+</head>
+<body class="antialiased selection:bg-primaryBrand selection:text-white relative">
+<!-- 3D Background Canvas -->
+<div id="bg-canvas"></div>
+<!-- BEGIN: Main Login Container -->
+<main class="w-full max-w-[440px] p-10 bg-card/80 backdrop-blur-xl rounded-[24px] border border-border shadow-2xl relative z-10 mx-4" data-purpose="login-card">
+<!-- BEGIN: Header Section -->
+<header class="text-center mb-10" data-purpose="card-header">
+<!-- 3D Centerpiece Container -->
+<div class="w-24 h-24 mx-auto mb-4 relative z-20" id="centerpiece-canvas"></div>
+<h1 class="text-3xl font-extrabold tracking-tight mb-2 flex items-center justify-center gap-1">
+<span class="text-brand-gradient">Prompt</span><span>Coroner</span>
+</h1>
+<p class="text-textSecondary text-sm font-medium">Welcome back, investigator</p>
+</header>
+<!-- END: Header Section -->
+<!-- BEGIN: OAuth Buttons -->
+<div class="space-y-4 mb-8" data-purpose="oauth-providers">
+<!-- Google Button -->
+<button class="w-full flex items-center justify-center gap-3 py-3 px-4 bg-[#181A20] hover:bg-[#1E2128] border border-border rounded-xl text-sm font-semibold transition-colors duration-200">
+<svg class="w-5 h-5" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+</svg>
+        Continue with Google
+      </button>
+<!-- GitHub Button -->
+<button class="w-full flex items-center justify-center gap-3 py-3 px-4 bg-[#181A20] hover:bg-[#1E2128] border border-border rounded-xl text-sm font-semibold transition-colors duration-200">
+<svg class="w-5 h-5 text-white" fill="currentColor" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"></path>
+</svg>
+        Continue with GitHub
+      </button>
+</div>
+<!-- END: OAuth Buttons -->
+<!-- BEGIN: Divider -->
+<div class="relative flex items-center mb-8" data-purpose="divider">
+<div class="flex-grow border-t border-[#2A2E37]"></div>
+<span class="flex-shrink-0 mx-4 text-xs font-semibold tracking-wider text-[#646A7A] uppercase">
+        Or continue with email
+      </span>
+<div class="flex-grow border-t border-[#2A2E37]"></div>
+</div>
+<!-- END: Divider -->
+<!-- BEGIN: Email Form -->
+<form class="space-y-5" data-purpose="email-login-form">
+<!-- Email Input -->
+<div class="space-y-2">
+<label class="block text-xs font-medium text-textSecondary" for="email">Email address</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-textSecondary">
+<i class="fa-regular fa-envelope"></i>
+</div>
+<input class="block w-full pl-10 pr-3 py-3 bg-inputBg border border-inputBorder rounded-xl text-sm placeholder-[#555967] text-white focus:ring-0 transition-shadow duration-200" id="email" name="email" placeholder="you@example.com" required="" type="email"/>
+</div>
+</div>
+<!-- Password Input -->
+<div class="space-y-2">
+<label class="block text-xs font-medium text-textSecondary" for="password">Password</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-textSecondary">
+<i class="fa-solid fa-lock text-[13px]"></i>
+</div>
+<input class="block w-full pl-10 pr-3 py-3 bg-inputBg border border-inputBorder rounded-xl text-sm placeholder-[#555967] text-white focus:ring-0 transition-shadow duration-200" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+</div>
+</div>
+<!-- Submit Button -->
+<button class="w-full mt-8 py-3.5 px-4 bg-brand-gradient hover:opacity-90 rounded-xl text-sm font-semibold text-white shadow-button-glow transition-all duration-200 flex items-center justify-center gap-2 group" type="submit">
+        Sign In
+        <i class="fa-solid fa-arrow-right text-xs transition-transform group-hover:translate-x-1"></i>
+</button>
+</form>
+<!-- END: Email Form -->
+<!-- BEGIN: Footer Links -->
+<div class="mt-8 text-center" data-purpose="card-footer">
+<p class="text-xs text-textSecondary">
+        Don't have an account? 
+        <a class="text-primaryBrand hover:text-white font-medium transition-colors" href="#">Create one now</a>
+</p>
+</div>
+<!-- END: Footer Links -->
+</main>
+<!-- END: Main Login Container -->
+<script>  // Setup 3D Background Particle Field
+  const bgInit = () => {
+    const container = document.getElementById('bg-canvas');
+    const scene = new THREE.Scene();
+    
+    // Add subtle ambient fog matching background
+    scene.fog = new THREE.FogExp2(0x0B0D13, 0.001);
+
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+    camera.position.z = 1000;
+
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+
+    // Create particles
+    const geometry = new THREE.BufferGeometry();
+    const particlesCount = 1500;
+    const posArray = new Float32Array(particlesCount * 3);
+    const colorArray = new Float32Array(particlesCount * 3);
+
+    const color1 = new THREE.Color('#7F75F8');
+    const color2 = new THREE.Color('#5587F7');
+
+    for(let i = 0; i < particlesCount * 3; i+=3) {
+      // Spread particles widely
+      posArray[i] = (Math.random() - 0.5) * 3000;
+      posArray[i+1] = (Math.random() - 0.5) * 3000;
+      posArray[i+2] = (Math.random() - 0.5) * 2000;
+
+      // Mix colors
+      const mixedColor = color1.clone().lerp(color2, Math.random());
+      colorArray[i] = mixedColor.r;
+      colorArray[i+1] = mixedColor.g;
+      colorArray[i+2] = mixedColor.b;
+    }
+
+    geometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+    geometry.setAttribute('color', new THREE.BufferAttribute(colorArray, 3));
+
+    const material = new THREE.PointsMaterial({ 
+      size: 4,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.6,
+      blending: THREE.AdditiveBlending
+    });
+
+    const particlesMesh = new THREE.Points(geometry, material);
+    scene.add(particlesMesh);
+
+    // Mouse Interaction
+    let mouseX = 0;
+    let mouseY = 0;
+    let targetX = 0;
+    let targetY = 0;
+
+    const windowHalfX = window.innerWidth / 2;
+    const windowHalfY = window.innerHeight / 2;
+
+    document.addEventListener('mousemove', (event) => {
+      mouseX = (event.clientX - windowHalfX);
+      mouseY = (event.clientY - windowHalfY);
+    });
+
+    // Handle Resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    const animate = () => {
+      requestAnimationFrame(animate);
+
+      targetX = mouseX * 0.1;
+      targetY = mouseY * 0.1;
+
+      particlesMesh.rotation.y += 0.001;
+      particlesMesh.rotation.x += 0.0005;
+
+      // Smooth camera movement
+      camera.position.x += (mouseX * 0.5 - camera.position.x) * 0.02;
+      camera.position.y += (-mouseY * 0.5 - camera.position.y) * 0.02;
+      camera.lookAt(scene.position);
+
+      renderer.render(scene, camera);
+    };
+
+    animate();
+  };
+
+  // Setup 3D Centerpiece
+  const centerpieceInit = () => {
+    const container = document.getElementById('centerpiece-canvas');
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 100);
+    camera.position.z = 5;
+
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setSize(width, height);
+    renderer.setPixelRatio(window.devicePixelRatio);
+    container.appendChild(renderer.domElement);
+
+    // Create a faceted diamond / octahedron shape
+    const geometry = new THREE.OctahedronGeometry(1.5, 0);
+    
+    // Tech-noir wireframe + solid material setup
+    const material = new THREE.MeshStandardMaterial({
+      color: 0x5587F7, 
+      emissive: 0x2A1B6A,
+      emissiveIntensity: 0.5,
+      roughness: 0.2,
+      metalness: 0.8,
+      flatShading: true,
+      transparent: true,
+      opacity: 0.9
+    });
+
+    const mesh = new THREE.Mesh(geometry, material);
+    
+    // Add wireframe overlay for investigative tech look
+    const wireframeMaterial = new THREE.MeshBasicMaterial({
+      color: 0x7F75F8,
+      wireframe: true,
+      transparent: true,
+      opacity: 0.4
+    });
+    const wireframe = new THREE.Mesh(geometry, wireframeMaterial);
+    mesh.add(wireframe);
+
+    // --- Scanning Light Beam Effect ---
+    const beamGeometry = new THREE.CylinderGeometry(1.6, 1.6, 0.05, 32);
+    const beamMaterial = new THREE.MeshBasicMaterial({
+      color: 0x8774f9,
+      transparent: true,
+      opacity: 0.8,
+      blending: THREE.AdditiveBlending,
+      side: THREE.DoubleSide
+    });
+    const scanBeam = new THREE.Mesh(beamGeometry, beamMaterial);
+    scanBeam.rotation.x = Math.PI / 2;
+    mesh.add(scanBeam);
+
+    scene.add(mesh);
+
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+
+    const pointLight = new THREE.PointLight(0x7F75F8, 2);
+    pointLight.position.set(2, 3, 4);
+    scene.add(pointLight);
+
+    const pointLight2 = new THREE.PointLight(0x5587F7, 2);
+    pointLight2.position.set(-2, -3, 2);
+    scene.add(pointLight2);
+
+    const animate = () => {
+      requestAnimationFrame(animate);
+      
+      const time = Date.now() * 0.001;
+
+      // Smooth rotation
+      mesh.rotation.y += 0.01;
+      mesh.rotation.x += 0.005;
+      
+      // Gentle floating
+      mesh.position.y = Math.sin(time * 2) * 0.15;
+
+      // Scan beam movement - INCREASED SPEED
+      // Cycle between -1.5 and 1.5 height
+      scanBeam.position.y = Math.sin(time * 3.0) * 1.6;
+      // Pulse opacity - INCREASED FREQUENCY
+      scanBeam.material.opacity = 0.4 + Math.sin(time * 6.0) * 0.4;
+
+      renderer.render(scene, camera);
+    };
+
+    animate();
+  };
+
+  // Initialize both
+  window.addEventListener('load', () => {
+    bgInit();
+    centerpieceInit();
+  });</script>
+</body></html>

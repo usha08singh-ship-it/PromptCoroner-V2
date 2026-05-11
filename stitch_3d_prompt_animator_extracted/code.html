@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>PromptCoroner Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&amp;family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface-container-highest": "#37333d",
+                        "surface-container": "#211e27",
+                        "tertiary-fixed-dim": "#ffb869",
+                        "tertiary-container": "#ca801e",
+                        "secondary-fixed": "#d8e2ff",
+                        "tertiary-fixed": "#ffdcbb",
+                        "on-secondary-fixed-variant": "#004395",
+                        "secondary": "#adc6ff",
+                        "on-background": "#e7e0ed",
+                        "primary-fixed-dim": "#d0bcff",
+                        "surface-tint": "#d0bcff",
+                        "on-secondary": "#002e6a",
+                        "tertiary": "#ffb869",
+                        "surface-bright": "#3b3742",
+                        "error": "#ffb4ab",
+                        "on-secondary-fixed": "#001a42",
+                        "on-primary-fixed-variant": "#5516be",
+                        "on-tertiary-container": "#3f2300",
+                        "on-surface-variant": "#cbc3d7",
+                        "error-container": "#93000a",
+                        "outline-variant": "#494454",
+                        "on-primary": "#3c0091",
+                        "background": "#15121b",
+                        "surface": "#15121b",
+                        "on-tertiary": "#482900",
+                        "secondary-fixed-dim": "#adc6ff",
+                        "primary": "#d0bcff",
+                        "on-error": "#690005",
+                        "on-secondary-container": "#e6ecff",
+                        "primary-fixed": "#e9ddff",
+                        "surface-container-high": "#2c2832",
+                        "surface-container-lowest": "#0f0d15",
+                        "on-tertiary-fixed-variant": "#673d00",
+                        "on-tertiary-fixed": "#2c1700",
+                        "on-surface": "#e7e0ed",
+                        "on-error-container": "#ffdad6",
+                        "inverse-surface": "#e7e0ed",
+                        "on-primary-fixed": "#23005c",
+                        "on-primary-container": "#340080",
+                        "surface-variant": "#37333d",
+                        "inverse-primary": "#6d3bd7",
+                        "surface-container-low": "#1d1a23",
+                        "surface-dim": "#15121b",
+                        "inverse-on-surface": "#322f39",
+                        "secondary-container": "#0566d9",
+                        "outline": "#958ea0",
+                        "primary-container": "#a078ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "xl": "2.5rem",
+                        "container-max": "1440px",
+                        "xs": "0.25rem",
+                        "gutter": "24px",
+                        "sm": "0.5rem",
+                        "lg": "1.5rem",
+                        "base": "4px",
+                        "md": "1rem"
+                    },
+                    "fontFamily": {
+                        "label-code": ["JetBrains Mono"],
+                        "body-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Geist"],
+                        "headline-lg": ["Geist"],
+                        "display-lg": ["Geist"]
+                    },
+                    "fontSize": {
+                        "label-code": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "body-sm": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "headline-lg-mobile": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "headline-lg": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; background-color: #15121b; color: #e7e0ed; }
+        .glass-panel {
+            background-color: rgba(29, 26, 35, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(73, 68, 84, 0.2);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .tech-glow { box-shadow: 0 0 15px rgba(208, 188, 255, 0.15); }
+        .tech-glow-hover:hover { box-shadow: 0 0 25px rgba(208, 188, 255, 0.3); }
+        .scanline { background: linear-gradient(to bottom, rgba(208,188,255,0) 0%, rgba(208,188,255,0.1) 50%, rgba(208,188,255,0) 100%); }
+    </style>
+</head>
+<body class="bg-background text-on-background min-h-screen overflow-x-hidden">
+<!-- TopAppBar -->
+<header class="fixed bg-surface/80 backdrop-blur-[20px] docked full-width top-0 z-50 border-b border-outline-variant/20 shadow-[0_0_15px_rgba(208,188,255,0.1)] flex justify-between items-center w-full px-gutter h-16">
+<div class="flex items-center gap-4">
+<span class="font-headline-lg text-headline-lg md:text-headline-lg font-headline-lg text-primary tracking-tighter uppercase">PROMPT_CORONER</span>
+</div>
+<div class="flex items-center gap-6">
+<div class="relative hidden md:block">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
+<input class="bg-surface-container-lowest border border-outline-variant rounded-full py-1.5 pl-10 pr-4 text-body-sm font-body-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/50 w-64 placeholder:text-outline/70 transition-all" placeholder="Global Trace Search..." type="text"/>
+</div>
+<div class="flex items-center gap-md text-primary">
+<button class="hover:bg-surface-container-highest/50 hover:text-primary transition-all duration-300 p-2 rounded-full flex items-center justify-center group relative">
+<span class="material-symbols-outlined group-active:scale-95 group-active:opacity-80 transition-all duration-150">notifications_paused</span>
+</button>
+<button class="hover:bg-surface-container-highest/50 hover:text-primary transition-all duration-300 p-2 rounded-full flex items-center justify-center group relative">
+<span class="material-symbols-outlined group-active:scale-95 group-active:opacity-80 transition-all duration-150">account_tree</span>
+</button>
+<button class="hover:bg-surface-container-highest/50 hover:text-primary transition-all duration-300 p-2 rounded-full flex items-center justify-center group relative">
+<span class="material-symbols-outlined group-active:scale-95 group-active:opacity-80 transition-all duration-150">settings</span>
+</button>
+<div class="w-8 h-8 rounded-full ml-2 border border-outline-variant/30 overflow-hidden bg-surface-container-highest">
+<img alt="Analyst Profile" class="w-full h-full object-cover grayscale opacity-80 hover:opacity-100 transition-opacity" data-alt="A monochromatic headshot of an investigative analyst in a dark, clinical tech-noir setting. High contrast, sharp shadows." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAqnvzi7BgQ_RXoLxvfyxECaC5QIir_pTK_KyvClKPqClrtKNfRU396OxFw6jOWrNVkemoWN4QzyOeARMY_ic73s-OVYTTIAciif3B5fZ_bUVz95PTDS64Lj9GkJIrezTU929bbBCiHhFpJsWQdvtCGYHF8MZHSVV2lhGF27of7K5sRAMYFI-jtz1hedA9op2Lhjq6uPS7Eh2yfcG5Wdg28If5xRO_wEJImP9UItRwZ2dbZcAkbt_w6g0e_gaAATUssIy5zYzD3tA"/>
+</div>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="hidden md:flex bg-surface-container-low/60 backdrop-blur-[30px] docked left-0 h-full w-64 border-r border-outline-variant/10 shadow-none fixed left-0 top-0 h-screen flex flex-col pt-20 z-40">
+<div class="px-gutter mb-8 flex flex-col gap-2">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-DEFAULT bg-surface-container-highest border border-outline-variant/30 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined">memory</span>
+</div>
+<div>
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface tracking-tight leading-none text-[16px]">CYBER_FORENSICS</h2>
+<p class="font-label-code text-label-code text-tertiary">Station ID: 77-X</p>
+</div>
+</div>
+</div>
+<button class="mx-4 mb-8 bg-gradient-to-r from-primary-container to-inverse-primary text-on-primary-container font-label-code text-label-code py-3 px-4 rounded-DEFAULT tech-glow hover:brightness-110 transition-all border border-primary/20 uppercase font-bold text-center">
+            INITIATE SCAN
+        </button>
+<nav class="flex-1 overflow-y-auto w-full">
+<ul class="flex flex-col w-full font-label-code text-label-code">
+<li>
+<a class="flex items-center gap-md bg-primary/10 text-primary border-r-2 border-primary py-3 px-4 hover:bg-surface-container-highest/30 hover:text-primary-fixed-dim hover:shadow-[0_0_10px_rgba(208,188,255,0.2)] transition-all" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">terminal</span>
+                        Terminal
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-md text-on-surface-variant py-3 px-4 hover:bg-surface-container-highest/30 hover:text-primary-fixed-dim hover:shadow-[0_0_10px_rgba(208,188,255,0.2)] transition-all" href="#">
+<span class="material-symbols-outlined">radar</span>
+                        Active Scans
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-md text-on-surface-variant py-3 px-4 hover:bg-surface-container-highest/30 hover:text-primary-fixed-dim hover:shadow-[0_0_10px_rgba(208,188,255,0.2)] transition-all" href="#">
+<span class="material-symbols-outlined">folder_managed</span>
+                        Evidence Vault
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-md text-on-surface-variant py-3 px-4 hover:bg-surface-container-highest/30 hover:text-primary-fixed-dim hover:shadow-[0_0_10px_rgba(208,188,255,0.2)] transition-all" href="#">
+<span class="material-symbols-outlined">hub</span>
+                        Neural Trace
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-md text-on-surface-variant py-3 px-4 hover:bg-surface-container-highest/30 hover:text-primary-fixed-dim hover:shadow-[0_0_10px_rgba(208,188,255,0.2)] transition-all" href="#">
+<span class="material-symbols-outlined">list_alt</span>
+                        Log Stream
+                    </a>
+</li>
+</ul>
+</nav>
+<div class="mt-auto pb-4">
+<ul class="flex flex-col w-full font-label-code text-label-code">
+<li>
+<a class="flex items-center gap-md text-on-surface-variant py-3 px-4 hover:bg-surface-container-highest/30 hover:text-primary-fixed-dim hover:shadow-[0_0_10px_rgba(208,188,255,0.2)] transition-all" href="#">
+<span class="material-symbols-outlined">memory</span>
+                        Diagnostics
+                    </a>
+</li>
+<li>
+<a class="flex items-center gap-md text-on-surface-variant py-3 px-4 hover:bg-surface-container-highest/30 hover:text-primary-fixed-dim hover:shadow-[0_0_10px_rgba(208,188,255,0.2)] transition-all" href="#">
+<span class="material-symbols-outlined">help_center</span>
+                        Help
+                    </a>
+</li>
+</ul>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="md:ml-64 pt-24 px-4 md:px-gutter pb-xl min-h-screen flex flex-col gap-xl">
+<!-- Top Section: Hero + Feed -->
+<div class="grid grid-cols-4 md:grid-cols-12 gap-gutter">
+<!-- Central Hero Visualization (Span 8) -->
+<div class="col-span-4 md:col-span-8 glass-panel rounded-xl h-[450px] relative overflow-hidden group flex flex-col justify-end p-xl bg-surface-container-lowest/40" style="background-image: radial-gradient(circle at center, rgba(109, 59, 215, 0.1) 0%, transparent 70%);">
+<!-- Placeholder for 3D render bg image -->
+<div class="absolute inset-0 z-0 opacity-40 bg-cover bg-center mix-blend-screen" data-alt="A complex, abstract 3D data cluster visualization glowing with intense neon purple and electric blue energy against a pure black void. Intersecting nodes and laser-thin connections suggest a high-tech cybersecurity scan in progress. The style is clinical, cinematic tech-noir with a glassmorphism overlay effect." style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCca5KG9AJ5Sqw8T-DOg-gC13Tv3R99hRHmWmdGv6rdBAcD0UH7wbNdosDYYZgNtA8TXxqeRAW6lu9WtTs--ZPpDR_4mG29WCSVYixWnjxz7s5vowP3TnoJUUHWZ1WrBejbWKI5PoYTtj1FNyZF6LmuG62_XJWcfWZYzlj72Ln3wjsFKRBZ22hZzMzirIRRyN2geWl3kJAawJlg71VZcsI0i_P3wE_SXbHZlHVPWp382orGTl81gkjI4Qfh9JoACKheb0wFpgNcOg');"></div>
+<!-- Scanning line effect overlay -->
+<div class="absolute inset-0 z-10 scanline pointer-events-none opacity-50 mix-blend-screen bg-[length:100%_4px] bg-repeat-y"></div>
+<div class="relative z-20 w-full flex justify-between items-end">
+<div>
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 border border-primary/20 rounded-full mb-4">
+<div class="w-2 h-2 rounded-full bg-tertiary animate-pulse"></div>
+<span class="font-label-code text-label-code text-tertiary">SYSTEM NOMINAL</span>
+</div>
+<h1 class="font-display-lg text-display-lg text-on-surface mb-2 drop-shadow-md">Global Data Cluster</h1>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-lg">Monitoring real-time localized prompt anomalies across sector 7. Multi-node trace algorithms actively deployed.</p>
+</div>
+<div class="hidden lg:flex gap-4">
+<div class="bg-surface-container/80 backdrop-blur-md border border-outline-variant/30 rounded-lg p-4 min-w-[120px]">
+<p class="font-label-code text-label-code text-outline mb-1">NODES ACTIVE</p>
+<p class="font-headline-lg-mobile text-headline-lg-mobile text-primary">4,291</p>
+</div>
+<div class="bg-surface-container/80 backdrop-blur-md border border-outline-variant/30 rounded-lg p-4 min-w-[120px]">
+<p class="font-label-code text-label-code text-outline mb-1">TRACE EFFICIENCY</p>
+<p class="font-headline-lg-mobile text-headline-lg-mobile text-secondary">98.4%</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Live Case Feed (Span 4) -->
+<div class="col-span-4 md:col-span-4 glass-panel rounded-xl h-[450px] flex flex-col border-l border-l-outline-variant/30 md:border-l-0">
+<div class="p-4 border-b border-outline-variant/20 flex justify-between items-center bg-surface-container-highest/20 rounded-t-xl">
+<h3 class="font-label-code text-label-code text-on-surface uppercase font-bold flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px] text-tertiary">dynamic_feed</span> Live Case Feed
+                    </h3>
+<button class="text-outline hover:text-primary transition-colors"><span class="material-symbols-outlined text-[18px]">more_horiz</span></button>
+</div>
+<ul class="flex-1 overflow-y-auto font-label-code text-label-code custom-scrollbar flex flex-col">
+<li class="px-4 py-3 border-b border-outline-variant/10 hover:bg-surface-container-highest/30 transition-colors cursor-pointer group flex gap-3">
+<span class="text-outline/60 whitespace-nowrap pt-0.5">14:02:44</span>
+<div>
+<span class="text-tertiary block mb-0.5">SCAN COMPLETE</span>
+<span class="text-on-surface-variant block truncate max-w-[200px] group-hover:text-on-surface">Node Alpha-9 cleared.</span>
+</div>
+</li>
+<li class="px-4 py-3 border-b border-outline-variant/10 bg-surface-container-highest/10 hover:bg-surface-container-highest/30 transition-colors cursor-pointer group flex gap-3">
+<span class="text-outline/60 whitespace-nowrap pt-0.5">14:02:18</span>
+<div>
+<span class="text-error block mb-0.5 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">warning</span> ANOMALY DETECTED</span>
+<span class="text-on-surface-variant block truncate max-w-[200px] group-hover:text-on-surface">Unauthorized payload in sector 4.</span>
+</div>
+</li>
+<li class="px-4 py-3 border-b border-outline-variant/10 hover:bg-surface-container-highest/30 transition-colors cursor-pointer group flex gap-3">
+<span class="text-outline/60 whitespace-nowrap pt-0.5">14:01:05</span>
+<div>
+<span class="text-secondary block mb-0.5 animate-pulse">TRACING...</span>
+<span class="text-on-surface-variant block truncate max-w-[200px] group-hover:text-on-surface">Initiating origin traceback sequence.</span>
+</div>
+</li>
+<li class="px-4 py-3 border-b border-outline-variant/10 bg-surface-container-highest/10 hover:bg-surface-container-highest/30 transition-colors cursor-pointer group flex gap-3 opacity-70">
+<span class="text-outline/60 whitespace-nowrap pt-0.5">13:58:22</span>
+<div>
+<span class="text-outline block mb-0.5">LOG ENTRY</span>
+<span class="text-on-surface-variant block truncate max-w-[200px] group-hover:text-on-surface">Routine system diagnostic finished.</span>
+</div>
+</li>
+<li class="px-4 py-3 border-b border-outline-variant/10 hover:bg-surface-container-highest/30 transition-colors cursor-pointer group flex gap-3 opacity-70">
+<span class="text-outline/60 whitespace-nowrap pt-0.5">13:55:10</span>
+<div>
+<span class="text-outline block mb-0.5">VAULT UPDATE</span>
+<span class="text-on-surface-variant block truncate max-w-[200px] group-hover:text-on-surface">Evidence package #8892 archived.</span>
+</div>
+</li>
+<li class="px-4 py-3 border-b border-outline-variant/10 bg-surface-container-highest/10 hover:bg-surface-container-highest/30 transition-colors cursor-pointer group flex gap-3 opacity-70">
+<span class="text-outline/60 whitespace-nowrap pt-0.5">13:50:00</span>
+<div>
+<span class="text-outline block mb-0.5">USER LOGIN</span>
+<span class="text-on-surface-variant block truncate max-w-[200px] group-hover:text-on-surface">Analyst 77-X authenticated.</span>
+</div>
+</li>
+</ul>
+<div class="p-3 border-t border-outline-variant/20 bg-surface-container-lowest flex justify-center rounded-b-xl">
+<button class="font-label-code text-label-code text-primary hover:text-primary-fixed-dim transition-colors uppercase tracking-widest text-[10px]">View Full Log</button>
+</div>
+</div>
+</div>
+<!-- Secondary Grid: Tool Cards -->
+<div class="grid grid-cols-4 md:grid-cols-12 gap-gutter">
+<!-- Card 1: Deep Scan -->
+<div class="col-span-4 glass-panel rounded-xl p-6 flex flex-col justify-between tech-glow-hover transition-all duration-300 cursor-pointer group relative overflow-hidden bg-gradient-to-br from-surface-container-low/80 to-surface-container-lowest/40">
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-primary/20 transition-all"></div>
+<div class="mb-8 relative z-10">
+<div class="w-12 h-12 rounded-lg bg-surface-container border border-outline-variant/50 flex items-center justify-center mb-4 group-hover:border-primary/50 transition-colors">
+<span class="material-symbols-outlined text-[24px] text-primary">radar</span>
+</div>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2">Deep Scan</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Perform an exhaustive sector-by-sector forensic analysis of targeted data structures.</p>
+</div>
+<div class="relative z-10 flex items-center justify-between border-t border-outline-variant/20 pt-4">
+<span class="font-label-code text-label-code text-outline group-hover:text-primary transition-colors">READY</span>
+<span class="material-symbols-outlined text-outline group-hover:text-primary group-hover:translate-x-1 transition-all">arrow_forward</span>
+</div>
+</div>
+<!-- Card 2: Trace Origin -->
+<div class="col-span-4 glass-panel rounded-xl p-6 flex flex-col justify-between tech-glow-hover transition-all duration-300 cursor-pointer group relative overflow-hidden bg-gradient-to-br from-surface-container-low/80 to-surface-container-lowest/40">
+<div class="absolute top-0 right-0 w-32 h-32 bg-secondary/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-secondary/20 transition-all"></div>
+<div class="mb-8 relative z-10">
+<div class="w-12 h-12 rounded-lg bg-surface-container border border-outline-variant/50 flex items-center justify-center mb-4 group-hover:border-secondary/50 transition-colors">
+<span class="material-symbols-outlined text-[24px] text-secondary">hub</span>
+</div>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2">Trace Origin</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Map network pathways backwards to isolate the initial injection point of malicious prompts.</p>
+</div>
+<div class="relative z-10 flex items-center justify-between border-t border-outline-variant/20 pt-4">
+<span class="font-label-code text-label-code text-outline group-hover:text-secondary transition-colors">AWAITING INPUT</span>
+<span class="material-symbols-outlined text-outline group-hover:text-secondary group-hover:translate-x-1 transition-all">arrow_forward</span>
+</div>
+</div>
+<!-- Card 3: Evidence Export -->
+<div class="col-span-4 glass-panel rounded-xl p-6 flex flex-col justify-between tech-glow-hover transition-all duration-300 cursor-pointer group relative overflow-hidden bg-gradient-to-br from-surface-container-low/80 to-surface-container-lowest/40">
+<div class="absolute top-0 right-0 w-32 h-32 bg-tertiary/10 rounded-full blur-3xl -mr-10 -mt-10 group-hover:bg-tertiary/20 transition-all"></div>
+<div class="mb-8 relative z-10">
+<div class="w-12 h-12 rounded-lg bg-surface-container border border-outline-variant/50 flex items-center justify-center mb-4 group-hover:border-tertiary/50 transition-colors">
+<span class="material-symbols-outlined text-[24px] text-tertiary">download</span>
+</div>
+<h3 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface mb-2">Evidence Export</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Compile logs, metadata, and isolated payloads into cryptographically secure forensic packages.</p>
+</div>
+<div class="relative z-10 flex items-center justify-between border-t border-outline-variant/20 pt-4">
+<span class="font-label-code text-label-code text-outline group-hover:text-tertiary transition-colors">VAULT ACCESS</span>
+<span class="material-symbols-outlined text-outline group-hover:text-tertiary group-hover:translate-x-1 transition-all">arrow_forward</span>
+</div>
+</div>
+</div>
+</main>
+<style>
+        /* Minimalist scrollbar for tech feel */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(149, 142, 160, 0.3);
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: rgba(208, 188, 255, 0.5);
+        }
+    </style>
+</body></html>
